@@ -1,0 +1,20 @@
+# Ignorer les fichiers sensibles
+.env
+.env.*
+*.secret
+credentials.json
+token.txt
+
+# Ignorer les dossiers de dependances
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Ignorer les fichiers systeme Windows
+Thumbs.db
+*.tmp
+~$*
+
+# Ignorer les fichiers de session IA
+*.jsonl
