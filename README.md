@@ -1,4 +1,4 @@
-# Protocole de travail IA — DeepSeek
+# Protocole de travail IA - DeepSeek
 
 ## Pourquoi ce protocole existe
 
