@@ -3,55 +3,113 @@
 > Backlog de référence du projet.
 > Mis à jour à chaque chantier terminé ou réorienté.
 
-Dernière mise à jour : 2026-04-24
+Dernière mise à jour : 2026-09-13
 
 ---
 
 ## Contexte
 
 Le repo porte la version DeepSeek/opencode du protocole, son guide d'intégration
-et l'outil `show_context.ps1` (adapté pour fenêtre 1M). Le cap initial est de
-publier une v1.0 alignée avec les protocoles Claude (v1.2) et Codex (v1.3).
+et l'outil `show_context.ps1` (fenêtre 1M). Le cap actuel est de rester aligné
+sur PROTOCOLE-CODEX (v1.4, révision `a24f2443f64b09932a27db7343a87f6b18b86e05`)
+tout en conservant les spécificités DeepSeek : thinking mode, context caching,
+tool calling parallèle, monitoring de contexte.
 
 ## Hypothèses retenues
 
 - `README.md` sert de document maître opératif du repo.
-- `PROTOCOLE.md` est la source canonique à injecter dans `~/.claude/CLAUDE.md`.
+- `PROTOCOLE.md` est la source canonique ; elle est chargée globalement via
+  `~/.claude/CLAUDE.md` ou le champ `instructions` d'`opencode.json`.
 - `show_context.ps1` lit les `.jsonl` opencode (même emplacement que Claude Code).
 - DeepSeek V4 Pro = 1M tokens de contexte (source : api-docs.deepseek.com).
-- `rtk` et `gh` sont des outils optionnels de workflow.
+- La numérotation des versions reflète PROTOCOLE-CODEX pour faciliter la
+  comparaison ; le saut de v1.0 à v1.4 est documenté dans `CHANGELOG.md`.
+- L'installation peut être déléguée à l'IA par une demande en langage naturel
+  avec l'URL du dépôt ; l'utilisateur n'a pas à manipuler les fichiers.
+- Les limites de permissions et les arbitrages structurants restent explicites.
+- `rtk` et `gh` sont des outils optionnels de workflow, pas des sources
+  de vérité du projet.
 
 ## État courant
 
-- 2026-04-24 : adaptation approfondie avec les spécificités DeepSeek (thinking
-  mode, context caching disque, tool calling parallèle, rate limiting) et
-  opencode (AGENTS.md, agents Build/Plan/General/Explore, skills, LSP,
-  commandes slash, agent de compaction).
+- 2026-09-13 : alignement v1.4 sur PROTOCOLE-CODEX v1.4, à la demande explicite
+  de l'utilisateur. Ajouts : critères de réussite du chantier, preuves et portée
+  de la validation, boucle de réalisation et de correction, intégrité des
+  contrôles, installation déléguée, template `CLAUDE.md` projet, scénarios et
+  journal de validation. Repo publié sur main.
+  Critères du chantier : texte aligné sur la révision Codex, spécificités
+  DeepSeek conservées, documents de suivi fidèles. Vérifications : Git, UTF-8,
+  blocs Markdown. Essais comportementaux non exécutés.
+
+- 2026-04-24 : v1.0 publiée — adaptation approfondie avec les spécificités
+  DeepSeek (thinking mode, context caching disque, tool calling parallèle,
+  rate limiting) et opencode (AGENTS.md, agents Build/Plan/General/Explore,
+  skills, LSP, commandes slash, agent de compaction).
 
 ## Priorités hautes
 
 Format : `[ ]` à faire, `[~]` partiellement fait, `[x]` fait.
 
-### [x] HP1 — Publier la v1.0 du protocole DeepSeek
+### [~] HP1 — Maintenir l'alignement PROTOCOLE-CODEX
 
 **Objectif** :
-- Créer un protocole canonique pour DeepSeek V4 Pro via opencode, aligné
-  sur les versions Claude et Codex existantes.
+- Garder `PROTOCOLE.md`, `README.md`, `integrations/opencode.md` et
+  `templates/` synchronisés avec les évolutions de PROTOCOLE-CODEX,
+  sans perdre les spécificités DeepSeek.
 
 **Actions** :
-- Rédiger `PROTOCOLE.md` avec les 14 sections canoniques adaptées.
-- Créer `integrations/opencode.md` pour l'injection via `CLAUDE.md`.
-- Adapter `show_context.ps1` pour la fenêtre 1M.
-- Créer les templates standard (maître, roadmap, validation).
+- Suivre les révisions de PROTOCOLE-CODEX et adapter chaque évolution.
+- Vérifier que la hiérarchie des instructions reste claire pour un non-développeur.
 
 **Livrables** :
-- Dossier complet : `PROTOCOLE.md`, `README.md`, `ROADMAP.md`, `CHANGELOG.md`,
-  `integrations/opencode.md`, `show_context.ps1`, `templates/`, `.gitignore`,
-  `LICENSE`.
+- Protocole canonique, guide d'intégration, template `CLAUDE.md`, changelog.
+
+**Résultats observables attendus** :
+- Une session opencode chargée depuis ce repo applique les mêmes règles de fond
+  qu'une session Codex chargée depuis PROTOCOLE-CODEX, aux surfaces près.
+
+**Comportements à préserver** :
+- Sections 12 et 13 spécifiques DeepSeek (monitoring, thinking, caching,
+  tool calling) ; les parcours manuels d'installation.
+
+**Vérifications prévues** :
+- Comparaison section par section avec la révision Codex de référence ;
+  contrôles UTF-8 et blocs Markdown ; `git diff --check`.
 
 **Critère de fin** :
-- Un utilisateur peut installer opencode + protocole + `show_context.ps1` et
-  voir le protocole actif dès la première session.
+- Un utilisateur peut installer opencode en mode global, projet ou hybride
+  sans ambiguïté sur `CLAUDE.md`, `AGENTS.md`, `opencode.json`, `rtk`, `gh`
+  et les sources de vérité.
+
+### [ ] HP2 — Compléter la validation comportementale de v1.4
+
+**Objectif** : rendre les validations reproductibles et démontrer le chargement
+du protocole dans une session neuve.
+
+**Actions** :
+- Exécuter les scénarios de `VALIDATION_SCENARIOS.md` dans un projet d'essai
+  isolé, avec données fictives.
+- Consigner chaque résultat, traiter les écarts, retester ce qui a changé.
+
+**Livrables** :
+- Journal de validation complété avec preuves des essais.
+
+**Résultats observables attendus** :
+- Le protocole chargé est effectivement appliqué : création du maître avant
+  toute action, distinction repo / prod / validation, non-affaiblissement
+  des contrôles.
+
+**Comportements à préserver** :
+- Aucune modification des permissions réelles ni des instructions globales
+  pendant les essais.
+
+**Vérifications prévues** :
+- Les sept cas comportementaux et les six cas d'installation de
+  `VALIDATION_SCENARIOS.md`, chacun avec preuve et statut réel.
+
+**Critère de fin** :
+- Preuves d'essais consignées, écarts traités, publication et installation
+  explicitement renseignées. La relecture seule ne satisfait pas ce critère.
 
 ## Priorités moyennes
 
@@ -63,7 +121,6 @@ Format : `[ ]` à faire, `[~]` partiellement fait, `[x]` fait.
 
 **Actions** :
 - Créer un projet test sans `DOCUMENT_MAITRE.md`.
-- Lancer opencode avec le protocole dans `~/.claude/CLAUDE.md`.
 - Vérifier que le protocole de début de session se déclenche.
 
 **Livrables** :
@@ -89,36 +146,34 @@ Format : `[ ]` à faire, `[~]` partiellement fait, `[x]` fait.
 
 ## Priorités basses
 
-### [ ] BP1 — Ajouter un exemple de projet sensible
+### [x] BP1 — Ajouter un exemple de projet sensible
 
 **Objectif** :
 - Montrer comment documenter auth, données utilisateurs ou prod sensible
   dans un `CLAUDE.md` projet.
 
-**Actions** :
-- Rédiger un exemple bref mais réaliste.
-
 **Livrables** :
-- Exemple intégré à `integrations/opencode.md` ou à un template dédié.
+- Exemple de zone sensible et tableau « Contrôles par zone » intégrés à
+  `templates/CLAUDE.md` (v1.4).
 
 **Critère de fin** :
 - Le template montre clairement comment cadrer une zone sensible.
 
 ## Ordre recommandé d'exécution
 
-1. Publier la v1.0 (fait).
-2. Tester l'installation sur un projet vierge.
-3. Porter le monitoring hors Windows.
-4. Ajouter un exemple de projet sensible.
+1. Vérifier l'intégration déléguée, y compris les personnalisations et réinstallations.
+2. Exécuter les scénarios comportementaux isolés et consigner les résultats.
+3. Traiter les écarts puis publier et installer dans les cibles autorisées.
 
 ## Definition of done pour le prochain cap
 
 Le projet franchit un cap solide quand :
 - l'installation globale, projet et hybride donne les mêmes règles ;
-- le monitoring de contexte fonctionne sous Windows et est documenté ;
-- les outils optionnels (`rtk`, `gh`) sont cadrés sans devenir des dépendances cachées.
+- les outils optionnels (`rtk`, `gh`) sont cadrés sans devenir des dépendances cachées ;
+- le monitoring de contexte fonctionne sous Windows et est documenté.
 
 ## Prochaine action recommandée
 
-Tester l'installation dans un repo vierge avec `~/.claude/CLAUDE.md` contenant
-le protocole complet, puis consigner le résultat dans un journal de validation.
+Exécuter les scénarios de `VALIDATION_SCENARIOS.md` dans un projet isolé,
+y compris le test initial sans document maître, puis consigner leurs résultats
+avant de déclarer la v1.4 stable.

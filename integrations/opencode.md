@@ -2,26 +2,117 @@
 
 ## Principe
 
-opencode supporte deux surfaces d'instructions persistantes :
+opencode lit des instructions persistantes via plusieurs surfaces :
+`CLAUDE.md` (compatibilité Claude Code), `AGENTS.md` (natif opencode) et le
+champ `instructions` d'`opencode.json`. C'est la surface naturelle pour
+appliquer ce protocole.
 
-- **`CLAUDE.md`** (compatibilité Claude Code) : lu automatiquement à deux
-  niveaux — global (`~/.claude/CLAUDE.md`) et projet (`CLAUDE.md` à la racine).
-- **`AGENTS.md`** (natif opencode) : généré par `/init`, documente la stack,
-  les commandes et la structure du projet.
-
-Le protocole canonique vit dans `~/.claude/CLAUDE.md`. Le `AGENTS.md` projet
-complète, il ne remplace pas.
+Le protocole ne doit pas être injecté sous forme courte. `PROTOCOLE.md` est le
+texte canonique complet. Les instructions ci-dessous servent uniquement à le
+charger correctement dans opencode.
 
 ## Surfaces opencode concernées
 
 | Surface | Rôle dans le protocole |
 |---|---|
-| `~/.claude/CLAUDE.md` | Instructions globales chargées dans tous les projets (support principal du protocole). |
+| `~/.claude/CLAUDE.md` | Instructions globales chargées dans tous les projets. Support principal du protocole. |
 | `CLAUDE.md` projet | Instructions versionnées avec un repo précis. |
-| `AGENTS.md` projet | Généré par `/init`, fiche projet native opencode. |
+| `AGENTS.md` projet | Format natif opencode, généré par `/init` ; fiche projet. |
+| `opencode.json` | Champ `instructions` : liste de fichiers chargés dans la session (global ou projet). |
 | Agents (Build/Plan/General/Explore) | Modes de travail : Build = outils complets, Plan = lecture seule. |
-| Skills (`~/.agents/skills/`, `.opencode/skills/`) | Capacités ciblées, chargées à la demande via l'outil `skill`. |
-| `/init`, `/undo`, `/redo`, `/share` | Commandes slash de session.
+| Skills | Workflows réutilisables, utiles mais non garantis à chaque session. |
+| Commandes slash | Contrôle de session : `/init`, `/undo`, `/redo`, `/share`, `/connect`. |
+| Compaction | Agent automatique déclenché à l'approche de la limite de contexte. |
+
+## Installation et mise à jour exécutées par DeepSeek (via opencode)
+
+La demande « regarde ce dépôt et intègre le protocole » est une tâche à réaliser,
+pas une demande de tutoriel. L'utilisateur n'a pas à copier le texte, créer les
+fichiers, remplir les modèles ou exécuter les contrôles à la place de l'IA.
+Une demande de simple lecture ou d'avis n'autorise pas l'installation.
+
+### Cible et source
+
+- Respecter la portée demandée : projet, globale ou hybride. Sans précision,
+  utiliser le projet de travail identifié ; si absent ou ambigu, demander la cible.
+- Projet : intégrer dans son `CLAUDE.md` sans écraser son contenu existant.
+- Globale : déterminer la surface réellement chargée (`~/.claude/CLAUDE.md` ou
+  `opencode.json` global) ; ne pas déduire un chemin d'un exemple.
+- Hybride : protocole complet global, spécificités factuelles dans le projet.
+- Lire README, PROTOCOLE.md, roadmap et ce guide depuis une même révision source.
+  Consigner l'URL, la révision et la version. Signaler une version candidate ; ne
+  pas la présenter comme une version validée. Ne pas modifier le dépôt source
+  simplement parce que l'utilisateur souhaite l'utiliser dans un autre projet.
+
+### Inspection et préparation
+
+1. Lire les instructions globales et de projet pertinentes, les overrides et les
+   sources de vérité existantes. Vérifier les contraintes d'accès et l'état Git.
+2. Avant une création de maître, effectuer l'inspection factuelle limitée prévue
+   par le protocole. Réutiliser les documents équivalents déjà présents.
+3. Repérer les personnalisations et l'ancien protocole. Comparer au texte source
+   de la version installée si nécessaire ; ne pas utiliser une découpe approximative.
+4. Si un `opencode.json` ou un `CLAUDE.md` masque l'autre surface, le préserver et
+   établir une intégration dans le fichier effectivement chargé, sans duplication
+   des consignes. Si cela exige de trancher une contradiction de fond, présenter
+   seulement ce choix à l'utilisateur.
+5. Sauvegarder hors des chemins d'instructions actives les fichiers avant changement.
+   Conserver leurs octets, nommer la sauvegarde sans collision et noter son emplacement.
+   Les sauvegardes contenant des informations privées restent locales.
+
+### Intégration sans perte
+
+6. Encadrer le protocole complet par les marqueurs suivants, avec sa provenance
+   immédiatement au-dessus. Les marqueurs ne remplacent aucune partie du texte :
+
+```text
+Source : URL du dépôt, révision exacte, version
+<!-- BEGIN PROTOCOLE-DEEPSEEK -->
+[contenu intégral de PROTOCOLE.md]
+<!-- END PROTOCOLE-DEEPSEEK -->
+```
+
+7. Première installation : insérer un seul bloc et préserver les autres consignes.
+   Mise à jour : remplacer uniquement le bloc existant identifié. Sans marqueurs,
+   retrouver ses limites par comparaison avant toute substitution ; si elles ne
+   peuvent être établies sans risque, demander une clarification ciblée.
+8. Réinstallation identique : conserver le bloc existant, sans duplication ni
+   réécriture inutile. Préserver les personnalisations dans et hors du bloc : une
+   divergence interne est à réconcilier explicitement, jamais à effacer en silence.
+9. Créer et remplir uniquement les documents factuels manquants avec des informations
+   vérifiées ; noter les inconnues. Les choix structurants non autorisés nécessitent
+   un arbitrage, pas une invention. Ne pas copier des modèles vides sur des documents.
+
+### Vérification et compte rendu
+
+10. Relire les fichiers écrits et comparer le bloc à la source complète. Vérifier
+    l'absence de doublons et la conservation des personnalisations. Contrôler le diff
+    Git s'il existe ; pour les autres cibles, comparer à la sauvegarde.
+11. Vérifier les instructions effectivement sélectionnées et la taille cumulée par
+    rapport aux limites de la surface utilisée. Ne pas tronquer le protocole ni
+    augmenter silencieusement une portée ou une permission.
+12. Conserver un état identifiable des fichiers installés et un résultat de contrôle.
+    Distinguer installation vérifiée, chargement observé et comportement testé.
+    Ne pas lancer un agent supplémentaire sans autorisation explicite. Si une nouvelle
+    session est nécessaire et ne peut pas être vérifiée par les outils autorisés,
+    signaler cette limite et la seule action utilisateur encore nécessaire.
+13. Rendre un bilan court : cible, version/révision, fichiers concernés, sauvegarde,
+    contrôles et limites. Ne pas committer, pousser ou modifier la configuration
+    globale au-delà de la portée de la demande d'installation.
+
+En cas de restauration, comparer d'abord l'état actuel à celui écrit pendant
+l'installation : préserver les changements utilisateur intervenus entre-temps.
+Si le fichier n'a pas changé, restaurer la sauvegarde exacte ; sinon appliquer
+un retour ciblé vérifié. Aucun reset destructif ni écrasement aveugle.
+
+## Parcours manuel conservé
+
+Les options A, B et C ci-dessous sont destinées à qui souhaite effectuer lui-même
+l'installation. Les mêmes garanties s'appliquent : lire et sauvegarder tout fichier
+existant, préserver les personnalisations, identifier l'ancien bloc et éviter les
+doublons. Copier un modèle ne doit jamais écraser un `CLAUDE.md` déjà renseigné.
+En cas de mise à jour, appliquer les précautions de la procédure ci-dessus avant
+le collage. Le parcours délégué reste une alternative, pas un remplacement.
 
 ## Option A — Protocole global opencode
 
@@ -31,6 +122,12 @@ complète, il ne remplace pas.
 
 ```text
 C:\Users\<toi>\.claude\CLAUDE.md
+```
+
+Sous macOS / Linux :
+
+```text
+~/.claude/CLAUDE.md
 ```
 
 2. Coller **l'intégralité** de `PROTOCOLE.md` dans ce fichier.
@@ -45,43 +142,51 @@ C:\Users\<toi>\.claude\CLAUDE.md
    sans document maître, de commencer une session. Il doit identifier l'absence
    de maître et proposer de le créer avant d'agir sur le chantier demandé.
 
+**Variante `opencode.json` :** au lieu de copier le texte, le champ
+`instructions` peut référencer directement le fichier canonique :
+
+```json
+{
+  "instructions": [
+    "C:/PROJETS/PROTOCOLE DEEPSEEK/PROTOCOLE.md"
+  ]
+}
+```
+
+Le fichier source reste unique : la mise à jour du protocole profite alors à
+toutes les sessions sans recopie. Si le chemin change, mettre à jour la
+configuration en même temps que le protocole.
+
 ## Option B — Protocole par projet
 
 À utiliser si tu veux versionner le protocole avec un repo précis.
 
-1. Copier `PROTOCOLE.md` dans le `CLAUDE.md` à la racine du projet.
-2. Ajouter en haut une section spécifique au projet :
+1. Copier `templates/CLAUDE.md` à la racine du projet :
 
-```markdown
-# CLAUDE.md — [NOM DU PROJET]
-
-## Spécificités projet
-
-- **Langue** : français
-- **Stack** : (résumé)
-- **Contraintes** : utilisateur non-développeur, prod sensible, etc.
-- **Sources de vérité principales** :
-  - docs/DOCUMENT_MAITRE.md
-  - docs/ROADMAP.md
-  - docs/VALIDATION_LOG.md
-
----
-
-(ici tu colles le contenu de PROTOCOLE.md)
+```text
+<projet>\CLAUDE.md
 ```
+
+2. Remplir les spécificités projet : stack, commandes, sources de vérité,
+   zones sensibles, contraintes de prod.
+
+3. Coller ensuite **l'intégralité** de `PROTOCOLE.md` dans la section prévue.
+
+4. Committer `CLAUDE.md` avec le projet si le protocole doit suivre le repo.
 
 ## Option C — Hybride recommandé
 
 Pour un usage quotidien, le plus robuste est :
 
-- `~/.claude/CLAUDE.md` contient l'intégralité du protocole ;
+- `~/.claude/CLAUDE.md` (ou `opencode.json`) charge l'intégralité du protocole ;
 - chaque projet contient un `CLAUDE.md` court qui ne répète pas le protocole,
   mais ajoute les spécificités du projet ;
 - si un projet nécessite une règle contradictoire, l'utilisateur arbitre et la
   contradiction est documentée dans le `CLAUDE.md` projet.
 
 Dans cette option, le `CLAUDE.md` projet n'est pas une synthèse du protocole.
-C'est une fiche projet complémentaire.
+C'est une fiche projet complémentaire. Le `AGENTS.md` généré par `/init` documente
+la stack, les commandes et la structure du projet.
 
 ## Agents opencode
 
@@ -98,6 +203,9 @@ primaires avec **Tab**.
 **Mode Plan :** l'utilisateur peut basculer en mode Plan pour faire analyser
 une demande sans risque de modification. L'IA doit alors proposer un plan,
 puis suggérer de passer en mode Build pour l'exécution.
+
+Les subagents ne doivent pas être lancés automatiquement. Les utiliser seulement
+si l'utilisateur le demande explicitement ou demande une délégation parallèle.
 
 ## Contexte DeepSeek et context caching
 
@@ -128,10 +236,15 @@ chargées à la demande via l'outil `skill`. Chemins de découverte :
 - `.agents/skills/<nom>/SKILL.md`
 - `~/.agents/skills/<nom>/SKILL.md`
 
+Une skill peut compléter le protocole, mais ne doit pas être son seul support.
+opencode charge les skills par invocation explicite ou par correspondance avec
+leur description. Le protocole, lui, doit être actif avant de décider quelles
+skills sont utiles.
+
 Utilisation correcte :
 - créer une skill pour un workflow spécialisé ;
 - annoncer quand elle est utilisée ;
-- garder `CLAUDE.md` comme support principal du protocole ;
+- garder `CLAUDE.md` / `opencode.json` comme support principal du protocole ;
 - ne pas remplacer la lecture des sources de vérité par une skill.
 
 ## `rtk`
@@ -190,10 +303,11 @@ et son pourcentage de la fenêtre.
 Note l'emplacement où se trouve ce dossier, par exemple :
 - Windows : `C:\PROJETS\PROTOCOLE DEEPSEEK`
 
-### Étape 2 — Coller ce bloc dans `~/.claude/CLAUDE.md`
+### Étape 2 — Coller ce bloc dans le support global
 
-Ajoute ce bloc à la fin de ton `CLAUDE.md` global. **Remplace
-`<CHEMIN_VERS_PROTOCOLE_DEEPSEEK>`** par ton chemin réel.
+Ajoute ce bloc à la fin de ton `CLAUDE.md` global ou de tes instructions
+globales opencode. **Remplace `<CHEMIN_VERS_PROTOCOLE_DEEPSEEK>`** par ton
+chemin réel.
 
 ```markdown
 ## Auto-monitoring du contexte
@@ -221,7 +335,7 @@ Dans une nouvelle session opencode, demande simplement :
 Si opencode répond en exécutant la commande `powershell.exe ... show_context.ps1`
 et te donne un pourcentage réel, c'est gagné. S'il répond « je ne sais pas »
 ou s'il invente, le bloc n'est pas chargé : vérifier le chemin et le fait
-que le `CLAUDE.md` est bien lu en début de session.
+que le support global est bien lu en début de session.
 
 ### Côté utilisateur (toi, pas l'IA)
 
@@ -243,7 +357,7 @@ opencode déclenche automatiquement son agent de **compaction** quand le
 contexte approche la limite. La compaction compresse l'historique en un
 résumé et libère de l'espace.
 
-Avant compaction, fork ou changement d'agent, l'état réel doit être écrit
+Avant compaction ou changement d'agent, l'état réel doit être écrit
 dans le document maître, la roadmap ou le journal de validation si la vérité
 du projet a changé.
 
@@ -255,15 +369,26 @@ La fenêtre de 1M tokens de DeepSeek donne une grande marge, mais le
 `reasoning_content` des tours avec tool calls s'accumule et peut accélérer
 l'approche de la limite. Surveiller régulièrement avec `show_context.ps1`.
 
-## Test minimal
+## Maintenance et validation du dépôt source
 
-Dans un projet sans document maître :
+Pour faire évoluer ce protocole, travailler sur une branche dédiée, relire les
+changements avec les modèles et exécuter les scénarios de
+`../VALIDATION_SCENARIOS.md`. Consigner les essais réellement exécutés et les limites.
+Une publication sur GitHub ne met pas à jour les installations existantes : l'IA
+applique ensuite la procédure d'intégration ci-dessus à chaque cible autorisée.
+Un retour sur une version publiée utilise un commit correctif ou un revert ciblé,
+sans réécrire l'historique partagé.
+
+## Test minimal manuel
+
+Dans un projet sans document maître, sans autorisation préalable de le créer :
 
 1. Lancer une nouvelle session opencode.
 2. Poser une demande simple sur le projet.
-3. opencode doit constater l'absence du maître et proposer de le créer avant
-   de modifier ou analyser profondément le projet.
+3. opencode doit constater l'absence du maître et proposer de le créer avant de
+   modifier ou analyser profondément le projet.
 
 Si opencode répond directement à la demande sans mentionner les sources de vérité,
 le protocole n'est pas chargé ou il est trop faible dans la hiérarchie des
-instructions. Vérifier `~/.claude/CLAUDE.md` et le `CLAUDE.md` projet.
+instructions. Vérifier `~/.claude/CLAUDE.md`, `opencode.json`, le `CLAUDE.md`
+projet et le dossier de lancement.
