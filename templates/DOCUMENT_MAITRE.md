@@ -1,4 +1,4 @@
-# Document maître — [NOM DU PROJET]
+# Document maître - [NOM DU PROJET]
 
 > Ce document est la référence opérative principale du projet.
 > Il doit toujours pouvoir être lu seul et donner une image exacte du projet.
@@ -55,8 +55,8 @@ Règles :
 ## 6. Décisions structurantes
 
 (Liste des choix techniques ou produits qu'il ne faut pas reprendre sans
-arbitrage explicite : ex. « pas de framework JS », « Cloudflare Pages comme
-seule cible », « auth uniquement par magic link », etc.)
+arbitrage explicite : ex. "pas de framework JS", "Cloudflare Pages comme
+seule cible", "auth uniquement par magic link", etc.)
 
 ## 7. Variables d'environnement et secrets
 
